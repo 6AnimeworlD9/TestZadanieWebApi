@@ -12,10 +12,14 @@ namespace WebApiForBank
     public DbSet<TableCards> TC { get; set; } = null!;
     public DbSet<TableHisOfOper> THO { get; set; } = null!;
     public DbSet<TableFavourites> TF { get; set; } = null!;
-    public Context(DbContextOptions<Context> options)
-    : base(options)
+    public Context()
     {
 
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlServer (Resource.StringConnection);
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

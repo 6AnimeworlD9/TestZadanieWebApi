@@ -3,49 +3,66 @@ using WebApiForBank;
 
 var builder = WebApplication.CreateBuilder(args);
 string connection = Resource.StringConnection;
-builder.Services.AddDbContext<Context>(options => options.UseSqlServer(connection));
+//builder.Services.AddDbContext<Context>(options => options.UseSqlServer(connection));
 
 
 var app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
-
-app.MapGet("/api/TMA", async (Context db) => await db.TMA.ToListAsync());
-
-app.MapGet("/api/TMA/{id:int}", async (int id, Context db) =>
+//cледующий метод дл€ получени€ данных с таблицы счетов в формате string в табличной форме
+app.MapGet("/api/TMA", async context =>
 {
-    TableMoneyAccounts? tma = await db.TMA.FirstOrDefaultAsync(u => u.Id == id);
-    if (tma == null) return Results.NotFound(new { message = "—чет по этому id не найден" });
-    return Results.Json(tma);
+    context.Response.Headers.ContentLanguage = "ru-RU";
+    context.Response.Headers.ContentType = "text/plain; charset=utf-8";
+    await context.Response.WriteAsync("“аблица счетов(id; номер счета)" + '\n');
+    using (Context db = new Context())
+    {
+        var info = db.TMA.FromSqlRaw("SELECT * FROM MoneyAccounts").ToList();
+        foreach (var rows in info)
+            await context.Response.WriteAsync(rows.Id.ToString()+"  "+ rows.Number.ToString() + '\n');
+    }
+});
+//cледующий метод дл€ получени€ данных с таблицы карточек в формате string в табличной форме
+app.MapGet("/api/T—", async context =>
+{
+    context.Response.Headers.ContentLanguage = "ru-RU";
+    context.Response.Headers.ContentType = "text/plain; charset=utf-8";
+    await context.Response.WriteAsync("“аблица карт(id; id счета, к которому прив€зана карта; номер карты; сумма на карте" + '\n');
+    using (Context db = new Context())
+    {
+        var info = db.TC.FromSqlRaw("SELECT * FROM Cards").ToList();
+        foreach (var rows in info)
+            await context.Response.WriteAsync(rows.Id.ToString() + "  " + rows.IdMonAcc.ToString() + "  " + rows.Number.ToString() + "  " + rows.Value.ToString() + '\n');
+    }
+});
+//cледующий метод дл€ получени€ данных с таблицы избранных операций пользовател€ в формате string в табличной форме
+app.MapGet("/api/TF", async context =>
+{
+    context.Response.Headers.ContentLanguage = "ru-RU";
+    context.Response.Headers.ContentType = "text/plain; charset=utf-8";
+    await context.Response.WriteAsync("“аблица избранных операций(id; информаци€; код картинки" + '\n');
+    using (Context db = new Context())
+    {
+        var info = db.TF.FromSqlRaw("SELECT * FROM Favourites").ToList();
+        foreach (var rows in info)
+            await context.Response.WriteAsync(rows.Id.ToString() + "  " + rows.info.ToString() + "  " + rows.Image.ToString() + '\n');
+    }
+});
+//cледующий метод дл€ получени€ данных с таблицы истории операций пользовател€ в формате string в табличной форме
+app.MapGet("/api/THO", async context =>
+{
+    context.Response.Headers.ContentLanguage = "ru-RU";
+    context.Response.Headers.ContentType = "text/plain; charset=utf-8";
+    await context.Response.WriteAsync("“аблица с историей операций(id; информаци€; код картинки" + '\n');
+    using (Context db = new Context())
+    {
+        var info = db.THO.FromSqlRaw("SELECT * FROM History_Of_Operations").ToList();
+        foreach (var rows in info)
+            await context.Response.WriteAsync(rows.Id.ToString() + "  " + rows.info.ToString() + "  " + rows.Image.ToString() + '\n');
+    }
 });
 
-app.MapGet("/api/TC", async (Context db) => await db.TC.ToListAsync());
-
-app.MapGet("/api/TC/{id:int}", async (int id, Context db) =>
-{
-    TableCards? tc = await db.TC.FirstOrDefaultAsync(u => u.Id == id);
-    if (tc == null) return Results.NotFound(new { message = " арта по этому id не найдена" });
-    return Results.Json(tc);
-});
-
-app.MapGet("/api/THO", async (Context db) => await db.THO.ToListAsync());
-
-app.MapGet("/api/THO/{id:int}", async (int id, Context db) =>
-{
-    TableHisOfOper? tho = await db.THO.FirstOrDefaultAsync(u => u.Id == id);
-    if (tho == null) return Results.NotFound(new { message = "»стори€ операции по этому id не найдена" });
-    return Results.Json(tho);
-});
-
-app.MapGet("/api/TF", async (Context db) => await db.TF.ToListAsync());
-
-app.MapGet("/api/TF/{id:int}", async (int id, Context db) =>
-{
-    TableFavourites? tf = await db.TF.FirstOrDefaultAsync(u => u.Id == id);
-    if (tf == null) return Results.NotFound(new { message = "»збранное пользовател€ по этому id не найден" });
-    return Results.Json(tf);
-});
 app.Run();
 
 
