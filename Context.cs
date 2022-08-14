@@ -6,20 +6,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WebApiForBank
 {
+    //класс контекста БД, с помощью которой уже и будем работать с БД из SQL Express
     public class Context : DbContext
 {
     public DbSet<TableMoneyAccounts> TMA { get; set; } = null!;
     public DbSet<TableCards> TC { get; set; } = null!;
     public DbSet<TableHisOfOper> THO { get; set; } = null!;
     public DbSet<TableFavourites> TF { get; set; } = null!;
-    public Context()
-    {
+    public Context(DbContextOptions<Context> options)
+    : base(options)
+        {
 
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlServer (Resource.StringConnection);
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

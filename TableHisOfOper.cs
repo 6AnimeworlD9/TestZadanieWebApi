@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WebApiForBank
 {
+    //модель таблицы историй операций пользователей
+    [Table("History_Of_Operations")]
     public class TableHisOfOper
     {
         [Column("id")]
@@ -14,6 +16,6 @@ namespace WebApiForBank
         [Column("info")]
         public string info { get; set; } = "";
         [Column("imageInfo")]
-        public byte[] Image { get; set; }
+        public string Image { get; set; }
     }
 }

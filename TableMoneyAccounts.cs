@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WebApiForBank
 {
+    //модель таблицы счетов пользователей
+    [Table("MoneyAccounts")]
     public class TableMoneyAccounts
     {
         [Column("id")]

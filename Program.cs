@@ -1,66 +1,56 @@
-using Microsoft.EntityFrameworkCore;
+Ôªøusing Microsoft.EntityFrameworkCore;
 using WebApiForBank;
 
 var builder = WebApplication.CreateBuilder(args);
 string connection = Resource.StringConnection;
-//builder.Services.AddDbContext<Context>(options => options.UseSqlServer(connection));
+builder.Services.AddDbContext<Context>(options => options.UseSqlServer(connection));
 
 
 var app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
-//cÎÂ‰Û˛˘ËÈ ÏÂÚÓ‰ ‰Îˇ ÔÓÎÛ˜ÂÌËˇ ‰‡ÌÌ˚ı Ò Ú‡·ÎËˆ˚ Ò˜ÂÚÓ‚ ‚ ÙÓÏ‡ÚÂ string ‚ Ú‡·ÎË˜ÌÓÈ ÙÓÏÂ
-app.MapGet("/api/TMA", async context =>
+
+//c–ª–µ–¥—É—é—â–∏–µ –¥–≤–∞ –º–µ—Ç–æ–¥–∞ –¥–ª—è –ø–æ–ª—É—á–µ–Ω–∏—è –¥–∞–Ω–Ω—ã—Ö –≤ —Ñ–æ—Ä–º–∞—Ç–µ json —Ç–∞–±–ª–∏—Ü—ã —Å—á–µ—Ç–æ–≤ —Å–æ –≤—Å–µ—Ö —Å—Ç—Ä–æ–∫ –∏–ª–∏ —Ç–æ–ª—å–∫–æ —Å –æ–¥–Ω–æ–π —Å—Ç—Ä–æ–∫–∏ –ø–æ id
+app.MapGet("/api/TMA", async (Context db) => await db.TMA.ToListAsync());
+
+app.MapGet("/api/TMA/{id:int}", async (int id, Context db) =>
 {
-    context.Response.Headers.ContentLanguage = "ru-RU";
-    context.Response.Headers.ContentType = "text/plain; charset=utf-8";
-    await context.Response.WriteAsync("“‡·ÎËˆ‡ Ò˜ÂÚÓ‚(id; ÌÓÏÂ Ò˜ÂÚ‡)" + '\n');
-    using (Context db = new Context())
-    {
-        var info = db.TMA.FromSqlRaw("SELECT * FROM MoneyAccounts").ToList();
-        foreach (var rows in info)
-            await context.Response.WriteAsync(rows.Id.ToString()+"  "+ rows.Number.ToString() + '\n');
-    }
+TableMoneyAccounts? tma = await db.TMA.FirstOrDefaultAsync(u => u.Id == id);
+if (tma == null) return Results.NotFound(new { message = "–ü–æ —ç—Ç–æ–º—É id –Ω–∏—á–µ–≥–æ –Ω–µ –Ω–∞–π–¥–µ–Ω–æ!" });
+return Results.Json(tma);
 });
-//cÎÂ‰Û˛˘ËÈ ÏÂÚÓ‰ ‰Îˇ ÔÓÎÛ˜ÂÌËˇ ‰‡ÌÌ˚ı Ò Ú‡·ÎËˆ˚ Í‡ÚÓ˜ÂÍ ‚ ÙÓÏ‡ÚÂ string ‚ Ú‡·ÎË˜ÌÓÈ ÙÓÏÂ
-app.MapGet("/api/T—", async context =>
+
+//c–ª–µ–¥—É—é—â–∏–µ –¥–≤–∞ –º–µ—Ç–æ–¥–∞ –¥–ª—è –ø–æ–ª—É—á–µ–Ω–∏—è –¥–∞–Ω–Ω—ã—Ö –≤ —Ñ–æ—Ä–º–∞—Ç–µ json —Ç–∞–±–ª–∏—Ü—ã –∫–∞—Ä—Ç —Å–æ –≤—Å–µ—Ö —Å—Ç—Ä–æ–∫ –∏–ª–∏ —Ç–æ–ª—å–∫–æ —Å –æ–¥–Ω–æ–π —Å—Ç—Ä–æ–∫–∏ –ø–æ id
+app.MapGet("/api/TC", async (Context db) => await db.TC.ToListAsync());
+
+app.MapGet("/api/TC/{id:int}", async (int id, Context db) =>
 {
-    context.Response.Headers.ContentLanguage = "ru-RU";
-    context.Response.Headers.ContentType = "text/plain; charset=utf-8";
-    await context.Response.WriteAsync("“‡·ÎËˆ‡ Í‡Ú(id; id Ò˜ÂÚ‡, Í ÍÓÚÓÓÏÛ ÔË‚ˇÁ‡Ì‡ Í‡Ú‡; ÌÓÏÂ Í‡Ú˚; ÒÛÏÏ‡ Ì‡ Í‡ÚÂ" + '\n');
-    using (Context db = new Context())
-    {
-        var info = db.TC.FromSqlRaw("SELECT * FROM Cards").ToList();
-        foreach (var rows in info)
-            await context.Response.WriteAsync(rows.Id.ToString() + "  " + rows.IdMonAcc.ToString() + "  " + rows.Number.ToString() + "  " + rows.Value.ToString() + '\n');
-    }
+TableCards? tc = await db.TC.FirstOrDefaultAsync(u => u.Id == id);
+if (tc == null) return Results.NotFound(new { message = "–ü–æ —ç—Ç–æ–º—É id –Ω–∏—á–µ–≥–æ –Ω–µ –Ω–∞–π–¥–µ–Ω–æ!" });
+return Results.Json(tc);
 });
-//cÎÂ‰Û˛˘ËÈ ÏÂÚÓ‰ ‰Îˇ ÔÓÎÛ˜ÂÌËˇ ‰‡ÌÌ˚ı Ò Ú‡·ÎËˆ˚ ËÁ·‡ÌÌ˚ı ÓÔÂ‡ˆËÈ ÔÓÎ¸ÁÓ‚‡ÚÂÎˇ ‚ ÙÓÏ‡ÚÂ string ‚ Ú‡·ÎË˜ÌÓÈ ÙÓÏÂ
-app.MapGet("/api/TF", async context =>
+
+//c–ª–µ–¥—É—é—â–∏–µ –¥–≤–∞ –º–µ—Ç–æ–¥–∞ –¥–ª—è –ø–æ–ª—É—á–µ–Ω–∏—è –¥–∞–Ω–Ω—ã—Ö –≤ —Ñ–æ—Ä–º–∞—Ç–µ json —Ç–∞–±–ª–∏—Ü—ã –∏—Å—Ç–æ—Ä–∏–π –æ–ø–µ—Ä–∞—Ü–∏–π —Å–æ –≤—Å–µ—Ö —Å—Ç—Ä–æ–∫ –∏–ª–∏ —Ç–æ–ª—å–∫–æ —Å –æ–¥–Ω–æ–π —Å—Ç—Ä–æ–∫–∏ –ø–æ id
+//–∫–∞—Ä—Ç–∏–Ω–∫–∏ –ø—Ä–∏—Å—ã–ª–∞—é—Ç—Å—è –≤ —Ç–µ–∫—Å—Ç–æ–≤–æ–º –∫–æ–¥–∏—Ä–æ–≤–∞–Ω–Ω–æ–º —Ñ–æ—Ä–º–∞—Ç–µ base64
+app.MapGet("/api/THO", async (Context db) => await db.THO.ToListAsync());
+
+app.MapGet("/api/THO/{id:int}", async (int id, Context db) =>
 {
-    context.Response.Headers.ContentLanguage = "ru-RU";
-    context.Response.Headers.ContentType = "text/plain; charset=utf-8";
-    await context.Response.WriteAsync("“‡·ÎËˆ‡ ËÁ·‡ÌÌ˚ı ÓÔÂ‡ˆËÈ(id; ËÌÙÓÏ‡ˆËˇ; ÍÓ‰ Í‡ÚËÌÍË" + '\n');
-    using (Context db = new Context())
-    {
-        var info = db.TF.FromSqlRaw("SELECT * FROM Favourites").ToList();
-        foreach (var rows in info)
-            await context.Response.WriteAsync(rows.Id.ToString() + "  " + rows.info.ToString() + "  " + rows.Image.ToString() + '\n');
-    }
+TableHisOfOper? tho = await db.THO.FirstOrDefaultAsync(u => u.Id == id);
+if (tho == null) return Results.NotFound(new { message = "–ü–æ —ç—Ç–æ–º—É id –Ω–∏—á–µ–≥–æ –Ω–µ –Ω–∞–π–¥–µ–Ω–æ!" });
+return Results.Json(tho);
 });
-//cÎÂ‰Û˛˘ËÈ ÏÂÚÓ‰ ‰Îˇ ÔÓÎÛ˜ÂÌËˇ ‰‡ÌÌ˚ı Ò Ú‡·ÎËˆ˚ ËÒÚÓËË ÓÔÂ‡ˆËÈ ÔÓÎ¸ÁÓ‚‡ÚÂÎˇ ‚ ÙÓÏ‡ÚÂ string ‚ Ú‡·ÎË˜ÌÓÈ ÙÓÏÂ
-app.MapGet("/api/THO", async context =>
+
+//c–ª–µ–¥—É—é—â–∏–µ –¥–≤–∞ –º–µ—Ç–æ–¥–∞ –¥–ª—è –ø–æ–ª—É—á–µ–Ω–∏—è –¥–∞–Ω–Ω—ã—Ö –≤ —Ñ–æ—Ä–º–∞—Ç–µ json —Ç–∞–±–ª–∏—Ü—ã –∏–∑–±—Ä–∞–Ω–Ω—ã—Ö –æ–ø–µ—Ä–∞—Ü–∏–π —Å–æ –≤—Å–µ—Ö —Å—Ç—Ä–æ–∫ –∏–ª–∏ —Ç–æ–ª—å–∫–æ —Å –æ–¥–Ω–æ–π —Å—Ç—Ä–æ–∫–∏ –ø–æ id
+//–∫–∞—Ä—Ç–∏–Ω–∫–∏ –ø—Ä–∏—Å—ã–ª–∞—é—Ç—Å—è –≤ —Ç–µ–∫—Å—Ç–æ–≤–æ–º –∫–æ–¥–∏—Ä–æ–≤–∞–Ω–Ω–æ–º —Ñ–æ—Ä–º–∞—Ç–µ base64
+app.MapGet("/api/TF", async (Context db) => await db.TF.ToListAsync());
+
+app.MapGet("/api/TF/{id:int}", async (int id, Context db) =>
 {
-    context.Response.Headers.ContentLanguage = "ru-RU";
-    context.Response.Headers.ContentType = "text/plain; charset=utf-8";
-    await context.Response.WriteAsync("“‡·ÎËˆ‡ Ò ËÒÚÓËÂÈ ÓÔÂ‡ˆËÈ(id; ËÌÙÓÏ‡ˆËˇ; ÍÓ‰ Í‡ÚËÌÍË" + '\n');
-    using (Context db = new Context())
-    {
-        var info = db.THO.FromSqlRaw("SELECT * FROM History_Of_Operations").ToList();
-        foreach (var rows in info)
-            await context.Response.WriteAsync(rows.Id.ToString() + "  " + rows.info.ToString() + "  " + rows.Image.ToString() + '\n');
-    }
+TableFavourites? tf = await db.TF.FirstOrDefaultAsync(u => u.Id == id);
+if (tf == null) return Results.NotFound(new { message = "–ü–æ —ç—Ç–æ–º—É id –Ω–∏—á–µ–≥–æ –Ω–µ –Ω–∞–π–¥–µ–Ω–æ!" });
+return Results.Json(tf);
 });
 
 app.Run();

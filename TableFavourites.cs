@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WebApiForBank
 {
+    //модель таблицы избранных операций пользователей
+    [Table("Favourites")]
     public class TableFavourites
     {
         [Column("id")]
@@ -14,6 +16,6 @@ namespace WebApiForBank
         [Column("info")]
         public string info { get; set; } = "";
         [Column("imageInfo")]
-        public byte[] Image { get; set; }
+        public string Image { get; set; }
     }
 }
